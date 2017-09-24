@@ -80,16 +80,14 @@ function showTasks($pdo)
         </tr>
     <?php }
 }
-
 if (isset($_POST['description']) and !empty($_POST['description'])) {
     $desc = $_POST['description'];
     $sqlInsert = "INSERT INTO `tasks` (`description`, `is_done`, `date_added`) VALUES ('$desc', '0', now())";
     $statement = $pdo->prepare($sqlInsert);
     $statement->execute();
     showTasks($pdo);
-    header('Location: ToDoApplication.php');
+    header('Location: Index.php');
 }
-
 if (isset ($_GET['action']) and !empty($_GET['id'])) {
     $id = $_GET['id'];
     if ($_GET['action'] == 'done') {
@@ -97,14 +95,30 @@ if (isset ($_GET['action']) and !empty($_GET['id'])) {
     } else if ($_GET['action'] == 'delete') {
         $sqlD = "DELETE FROM `tasks` WHERE id = '$id'";
     }
-
     $statement = $pdo->prepare($sqlD);
     $statement->execute();
-//    if ($_GET['action'] == 'edit'){
-//
-//    }
+    if ($_GET['action'] == 'edit'){
+        $sqlDesc = "SELECT * FROM tasks WHERE id = '$id' ";
+        $statement = $pdo->prepare($sqlDesc);
+        $statement->execute();
+        $row1 = $statement->FETCH(PDO::FETCH_ASSOC);
+?>
+    <form method="POST">
+        <input name="Newdescription" placeholder="Описание задачи" value="<?= $row1['description'] ?>" type="text">
+        <input name="save" value="Сохранить" type="submit">
+    </form>
+</div>
+<?php
+        if (isset($_POST['Newdescription'])){
+            $newDesc = $_POST['Newdescription'];
+            $sqlNewDesc = "UPDATE tasks SET `description` = '$newDesc' WHERE id = '$id'  ";
+            $statement = $pdo->prepare($sqlNewDesc);
+            $statement->execute();
+            showTasks($pdo);
+            header('Location: Index.php');
+        }
+    }
 }
-
 showTasks($pdo);
 ob_end_flush();
 ?>
