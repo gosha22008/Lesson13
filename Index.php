@@ -82,27 +82,28 @@ function showTasks($pdo)
 }
 if (isset($_POST['description']) and !empty($_POST['description'])) {
     $desc = $_POST['description'];
-    $sqlInsert = "INSERT INTO `tasks` (`description`, `is_done`, `date_added`) VALUES ('$desc', '0', now())";
+    $sqlInsert = "INSERT INTO `tasks` (`description`, `is_done`, `date_added`) VALUES (?, '0', now())";
     $statement = $pdo->prepare($sqlInsert);
-    $statement->execute();
-    showTasks($pdo);
-    header('Location: Index.php');
+    $statement->execute([$desc]);
+    //showTasks($pdo);
+    //header('Location: Index.php');
 }
 if (isset ($_GET['action']) and !empty($_GET['id'])) {
     $id = $_GET['id'];
     if ($_GET['action'] == 'done') {
-        $sqlD = "UPDATE `tasks` SET `is_done` = 1 WHERE id = '$id'";
+        $sqlD = "UPDATE `tasks` SET `is_done` = 1 WHERE id = ?";
     } else if ($_GET['action'] == 'delete') {
-        $sqlD = "DELETE FROM `tasks` WHERE id = '$id'";
+        $sqlD = "DELETE FROM `tasks` WHERE id = ?";
     }
     $statement = $pdo->prepare($sqlD);
-    $statement->execute();
+    $statement->execute([$id]);
     if ($_GET['action'] == 'edit'){
-        $sqlDesc = "SELECT * FROM tasks WHERE id = '$id' ";
+        $sqlDesc = "SELECT * FROM tasks WHERE id = ? ";
         $statement = $pdo->prepare($sqlDesc);
-        $statement->execute();
+        $statement->execute([$id]);
         $row1 = $statement->FETCH(PDO::FETCH_ASSOC);
 ?>
+        <div>
     <form method="POST">
         <input name="Newdescription" placeholder="Описание задачи" value="<?= $row1['description'] ?>" type="text">
         <input name="save" value="Сохранить" type="submit">
@@ -111,14 +112,15 @@ if (isset ($_GET['action']) and !empty($_GET['id'])) {
 <?php
         if (isset($_POST['Newdescription'])){
             $newDesc = $_POST['Newdescription'];
-            $sqlNewDesc = "UPDATE tasks SET `description` = '$newDesc' WHERE id = '$id'  ";
+            $sqlNewDesc = "UPDATE tasks SET `description` = '$newDesc' WHERE id = ?  ";
             $statement = $pdo->prepare($sqlNewDesc);
-            $statement->execute();
-            showTasks($pdo);
+            $statement->execute([$id]);
+            //showTasks($pdo);
             header('Location: Index.php');
         }
     }
 }
 showTasks($pdo);
+//header('Location: Index.php');
 ob_end_flush();
 ?>
