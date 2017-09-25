@@ -1,4 +1,4 @@
-<?php ob_start() ?>
+<?php //ob_start() ?>
     <html>
     <head>
         <style>
@@ -90,6 +90,7 @@ if (isset($_POST['description']) and !empty($_POST['description'])) {
 }
 if (isset ($_GET['action']) and !empty($_GET['id'])) {
     $id = $_GET['id'];
+    $sqlD = "";
     if ($_GET['action'] == 'done') {
         $sqlD = "UPDATE `tasks` SET `is_done` = 1 WHERE id = ?";
     } else if ($_GET['action'] == 'delete') {
@@ -116,11 +117,11 @@ if (isset ($_GET['action']) and !empty($_GET['id'])) {
             $statement = $pdo->prepare($sqlNewDesc);
             $statement->execute([$id]);
             //showTasks($pdo);
-            header('Location: Index.php');
+            //header('Location: Index.php');
         }
     }
 }
 showTasks($pdo);
 //header('Location: Index.php');
-ob_end_flush();
+//ob_end_flush();
 ?>
